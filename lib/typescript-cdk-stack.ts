@@ -1,6 +1,7 @@
 import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as s3 from 'aws-cdk-lib/aws-s3'
+import { Networking } from './networking';
 
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
@@ -16,5 +17,11 @@ export class TypescriptCdkStack extends Stack {
       value : bucket.bucketName,
       exportName : 'DocumentsBucketName'
     });
+
+    new Networking(this, 'Networkingconstruct', {
+      maxAzs : 2
+    });
+
+
   }
 }
