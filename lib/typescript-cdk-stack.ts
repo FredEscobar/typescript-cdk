@@ -1,4 +1,3 @@
-import { Sources } from './../api/getDocuments/node_modules/aws-sdk/clients/robomaker.d';
 import { CfnOutput, Stack, StackProps, Tags } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as s3 from 'aws-cdk-lib/aws-s3'
