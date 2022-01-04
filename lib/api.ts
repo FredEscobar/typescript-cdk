@@ -1,10 +1,13 @@
 import { BucketPermissionConfiguration } from './../api/getDocuments/node_modules/aws-sdk/clients/macie2.d';
 import * as cdk from "constructs";
+import { CfnOutput } from 'aws-cdk-lib';
 import * as lambda from "aws-cdk-lib/aws-lambda-nodejs";
 import * as s3 from 'aws-cdk-lib/aws-s3'
 import { Runtime } from "aws-cdk-lib/aws-lambda";
 import * as iam from 'aws-cdk-lib/aws-iam'
 import * as path from 'path'
+import * as apig from 'aws-cdk-lib/aws-apigateway'
+import { AuthorizationType } from 'aws-cdk-lib/aws-apigateway';
 
 interface DocumentManagementAPIProps {
     documentBucket: s3.IBucket
@@ -39,5 +42,20 @@ export class DocumentManagementAPI extends cdk.Construct {
         bucketContainerPermissions.addActions('s3:ListBucket');
         getDocumentsFunction.addToRolePolicy(bucketContainerPermissions);
 
+
+        const lambdaApi = new apig.LambdaRestApi(this, 'LambdaApi', {
+            handler : getDocumentsFunction,
+            proxy : false,
+            
+        });
+
+
+        const documents = lambdaApi.root.addResource('documents');
+        documents.addMethod('GET');
+
+        new CfnOutput(this, 'APIEndpoint', {
+            value : lambdaApi.url!,
+            exportName : 'APIEndpoint'        
+        })
     }
 }
