@@ -3,6 +3,7 @@ import { Construct } from 'constructs';
 import * as s3 from 'aws-cdk-lib/aws-s3'
 import { Networking } from './networking';
 import { DocumentManagementAPI } from './api';
+import { DocumentManagementWebServer } from './webserver';
 import * as s3Deploy from 'aws-cdk-lib/aws-s3-deployment'
 import * as path from 'path'
 
@@ -40,6 +41,14 @@ export class TypescriptCdkStack extends Stack {
     });
 
     Tags.of(api).add('Module', 'API');
+
+    const weserver = new DocumentManagementWebServer(this, 'DocumentManagement', {
+      vpc : networkingStack.vpc,
+      api : api.lambdaApi
+    });
+
+
+    Tags.of(weserver).add('Module', 'Webserver');
 
   }
 }

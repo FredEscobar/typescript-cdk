@@ -7,7 +7,6 @@ import { Runtime } from "aws-cdk-lib/aws-lambda";
 import * as iam from 'aws-cdk-lib/aws-iam'
 import * as path from 'path'
 import * as apig from 'aws-cdk-lib/aws-apigateway'
-import { AuthorizationType } from 'aws-cdk-lib/aws-apigateway';
 
 interface DocumentManagementAPIProps {
     documentBucket: s3.IBucket
@@ -15,6 +14,9 @@ interface DocumentManagementAPIProps {
 
 
 export class DocumentManagementAPI extends cdk.Construct {
+
+    public readonly lambdaApi : apig.LambdaRestApi
+
     constructor(scope: cdk.Construct, id: string, props: DocumentManagementAPIProps) {
         super(scope, id)
 
@@ -43,18 +45,18 @@ export class DocumentManagementAPI extends cdk.Construct {
         getDocumentsFunction.addToRolePolicy(bucketContainerPermissions);
 
 
-        const lambdaApi = new apig.LambdaRestApi(this, 'LambdaApi', {
+        this.lambdaApi = new apig.LambdaRestApi(this, 'LambdaApi', {
             handler : getDocumentsFunction,
             proxy : false,
             
         });
 
 
-        const documents = lambdaApi.root.addResource('documents');
+        const documents = this.lambdaApi.root.addResource('documents');
         documents.addMethod('GET');
 
         new CfnOutput(this, 'APIEndpoint', {
-            value : lambdaApi.url!,
+            value : this.lambdaApi.url!,
             exportName : 'APIEndpoint'        
         })
     }
